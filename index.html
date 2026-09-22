@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="心屿是一款轻量的情绪日记与自我关怀工具，帮助你记录情绪、理解触发因素，并找到此刻能做的小事。" />
+  <meta name="theme-color" content="#fbfaf7" />
+  <title>心屿｜情绪日记与自我关怀</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <header class="site-header">
+    <a class="brand" href="#" aria-label="心屿首页">
+      <span class="brand-mark" aria-hidden="true"><span></span></span>
+      <span>心屿</span>
+    </a>
+    <nav class="main-nav" aria-label="主导航">
+      <button class="nav-item active" data-page="today">今天</button>
+      <button class="nav-item" data-page="journey">情绪轨迹</button>
+    </nav>
+    <button class="quiet-button" id="privacyButton">隐私说明</button>
+  </header>
+
+  <main>
+    <section class="page active" id="todayPage">
+      <div class="hero">
+        <div>
+          <p class="eyebrow">晚上好，先照顾此刻的自己</p>
+          <h1>把说不清的情绪，<br />变成下一步可以做的小事。</h1>
+          <p class="hero-copy">无需组织语言，也没有正确答案。花两分钟记录，理解情绪从哪里来。</p>
+        </div>
+        <div class="streak-card" aria-label="连续记录天数">
+          <span class="streak-number" id="streakNumber">4</span>
+          <span>天连续记录</span>
+          <small>每一次觉察，都值得被看见</small>
+        </div>
+      </div>
+
+      <div class="workspace-grid">
+        <section class="record-card surface">
+          <div class="section-heading">
+            <div>
+              <span class="step-label">01 · 感受</span>
+              <h2>现在的心情更接近哪一种？</h2>
+            </div>
+            <span class="save-state" id="saveState">内容只保存在当前设备</span>
+          </div>
+
+          <div class="mood-options" id="moodOptions" role="radiogroup" aria-label="选择情绪">
+            <button class="mood-option" data-mood="低落" data-score="24" aria-pressed="false"><span class="mood-dot mood-low"><i></i></span><strong>低落</strong><small>提不起劲</small></button>
+            <button class="mood-option" data-mood="疲惫" data-score="40" aria-pressed="false"><span class="mood-dot mood-tired"><i></i></span><strong>疲惫</strong><small>需要休息</small></button>
+            <button class="mood-option selected" data-mood="平静" data-score="62" aria-pressed="true"><span class="mood-dot mood-calm"><i></i></span><strong>平静</strong><small>内心安稳</small></button>
+            <button class="mood-option" data-mood="轻松" data-score="78" aria-pressed="false"><span class="mood-dot mood-light"><i></i></span><strong>轻松</strong><small>没有负担</small></button>
+            <button class="mood-option" data-mood="开心" data-score="92" aria-pressed="false"><span class="mood-dot mood-happy"><i></i></span><strong>开心</strong><small>想分享喜悦</small></button>
+          </div>
+
+          <div class="intensity-row">
+            <label for="intensity">这种感觉有多明显？</label>
+            <div class="range-wrap">
+              <span>轻微</span>
+              <input id="intensity" type="range" min="1" max="5" value="3" />
+              <span>强烈</span>
+              <output id="intensityValue">3 / 5</output>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="journal-block">
+            <span class="step-label">02 · 发生</span>
+            <label class="field-label" for="journalText">最近发生了什么？</label>
+            <textarea id="journalText" maxlength="300" placeholder="不用写完整，想到什么就写什么……">今天连续开了几场会，回到家还是忍不住想着没完成的工作。</textarea>
+            <div class="textarea-meta"><span>写给自己看，不需要完美</span><span id="charCount">31 / 300</span></div>
+          </div>
+
+          <div class="journal-block compact">
+            <span class="step-label">03 · 线索</span>
+            <p class="field-label">它可能和什么有关？<small>可多选</small></p>
+            <div class="tag-options" id="triggerOptions">
+              <button data-trigger="工作负荷" class="selected">工作负荷</button>
+              <button data-trigger="学业压力">学业压力</button>
+              <button data-trigger="人际关系">人际关系</button>
+              <button data-trigger="睡眠不足" class="selected">睡眠不足</button>
+              <button data-trigger="身体状态">身体状态</button>
+              <button data-trigger="说不清">暂时说不清</button>
+            </div>
+          </div>
+
+          <button class="primary-button" id="saveEntryButton">
+            <span>完成记录，看看此刻需要什么</span>
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4" /></svg>
+          </button>
+        </section>
+
+        <aside class="insight-column">
+          <section class="insight-card surface" id="insightCard">
+            <div class="insight-topline"><span class="ai-badge"><i></i>温柔洞察</span><span id="insightTime">基于本次记录</span></div>
+            <div class="quote-mark">“</div>
+            <h2 id="insightTitle">你可能不是“不够努力”，只是连续消耗太久了。</h2>
+            <p id="insightBody">你提到连续会议和未完成的工作。即使已经回家，注意力仍停留在任务中，这种疲惫更像是持续消耗后的自然反应，而不是你的能力出了问题。</p>
+            <div class="pattern-box">
+              <span>我留意到的线索</span>
+              <div id="insightTags"><span>工作负荷</span><span>睡眠不足</span></div>
+            </div>
+          </section>
+
+          <section class="care-section">
+            <div class="care-heading"><div><span class="step-label">此刻的自我关怀</span><h2>不用解决一切，先选一件小事</h2></div><span>约 3 分钟</span></div>
+            <div class="care-list">
+              <button class="care-card featured" data-care="breath">
+                <span class="care-icon breath-icon"><i></i></span>
+                <span><strong>跟随呼吸，放松一下</strong><small>吸气 4 秒 · 呼气 6 秒</small></span>
+                <i class="arrow">→</i>
+              </button>
+              <button class="care-card" data-care="music">
+                <span class="care-icon music-icon"><i></i><i></i><i></i></span>
+                <span><strong>播放舒缓环境音</strong><small>让注意力暂时离开任务</small></span>
+                <i class="arrow">→</i>
+              </button>
+              <button class="care-card" data-care="stretch">
+                <span class="care-icon stretch-icon"><i></i></span>
+                <span><strong>做一次肩颈伸展</strong><small>适合久坐和会议之后</small></span>
+                <i class="arrow">→</i>
+              </button>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </section>
+
+    <section class="page" id="journeyPage">
+      <div class="journey-header">
+        <div><p class="eyebrow">你的情绪轨迹</p><h1>看见变化，而不是评判自己。</h1><p>趋势只是帮助你理解自己，不代表情绪有好坏之分。</p></div>
+        <button class="secondary-button" id="backToRecord">记录今天</button>
+      </div>
+
+      <div class="metrics-grid">
+        <article class="metric-card"><span>本周平均能量</span><strong id="averageScore">61</strong><small>较上周平稳</small></article>
+        <article class="metric-card"><span>本周记录</span><strong id="weeklyCount">6</strong><small>持续觉察中</small></article>
+        <article class="metric-card"><span>最常出现</span><strong id="commonMood">疲惫</strong><small id="commonMoodMeta">3 次记录</small></article>
+        <article class="metric-card"><span>高频触发</span><strong id="commonTrigger">工作</strong><small id="commonTriggerMeta">占本周记录 50%</small></article>
+      </div>
+
+      <div class="analytics-grid">
+        <section class="surface chart-card">
+          <div class="card-heading"><div><span class="step-label">最近 7 天</span><h2>情绪能量变化</h2></div><span class="legend"><i></i>能量值</span></div>
+          <div class="chart-wrap" id="moodChart" aria-label="最近七天情绪能量折线图"></div>
+          <p class="chart-insight" id="chartInsight"><span></span>你的情绪在高强度工作日后容易下降，休息后通常会有所恢复。</p>
+        </section>
+
+        <section class="surface trigger-card">
+          <div class="card-heading"><div><span class="step-label">触发因素</span><h2>最近什么更影响你？</h2></div></div>
+          <div class="trigger-bars" id="triggerBars"></div>
+          <p class="muted-note">只有记录次数较多时，趋势才更有参考意义。</p>
+        </section>
+      </div>
+
+      <section class="surface history-card">
+        <div class="card-heading"><div><span class="step-label">最近记录</span><h2>写下来的，都算数</h2></div><button class="text-button" id="clearEntries">清除我的本地记录</button></div>
+        <div class="history-list" id="historyList"></div>
+      </section>
+    </section>
+  </main>
+
+  <footer>
+    <p>心屿用于日常情绪记录与自我觉察，不提供医学诊断或专业心理治疗。</p>
+    <p>如果你正处于危险中，或有伤害自己的想法，请立即联系身边可信任的人与当地紧急援助。</p>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <div class="modal-backdrop" id="careModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" id="closeCareModal" aria-label="关闭">×</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="privacyModal" aria-hidden="true">
+    <div class="modal privacy-modal" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+      <button class="modal-close" id="closePrivacyModal" aria-label="关闭">×</button>
+      <span class="step-label">隐私说明</span>
+      <h2 id="privacyTitle">你的记录，首先属于你。</h2>
+      <p>当前雏形不会要求登录。你写下的内容仅保存在本设备的浏览器中，不会上传到服务器。</p>
+      <ul><li>你可以随时清除自己的记录</li><li>演示数据会与个人记录明确区分</li><li>产品洞察不构成医疗建议</li></ul>
+      <button class="primary-button small" id="understandPrivacy">我知道了</button>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
