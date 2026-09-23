@@ -28,9 +28,14 @@
     <section class="page active" id="todayPage">
       <div class="hero">
         <div>
-          <p class="eyebrow">晚上好，先照顾此刻的自己</p>
+          <p class="eyebrow">心屿 v0.2 · 有效关怀闭环</p>
           <h1>把说不清的情绪，<br />变成下一步可以做的小事。</h1>
-          <p class="hero-copy">无需组织语言，也没有正确答案。花两分钟记录，理解情绪从哪里来。</p>
+          <p class="hero-copy">用一分钟记录感受。心屿会整理触发线索、解释推荐原因，并记住什么方式真正对你有效。</p>
+          <div class="hero-actions">
+            <button class="primary-button hero-primary" id="startDemoButton">体验 1 分钟情绪记录</button>
+            <button class="text-button hero-link" id="viewExampleButton">先看完整演示结果 →</button>
+          </div>
+          <div class="value-pills" aria-label="产品核心能力"><span>快速记录</span><i></i><span>触发分析</span><i></i><span>个性化关怀</span></div>
         </div>
         <div class="streak-card" aria-label="连续记录天数">
           <span class="streak-number" id="streakNumber">4</span>
@@ -39,8 +44,14 @@
         </div>
       </div>
 
+      <div class="demo-guide" id="demoGuide">
+        <span class="demo-label">1 分钟了解心屿</span>
+        <ol><li class="active"><b>1</b>选择感受</li><li><b>2</b>写下一件事</li><li><b>3</b>获得洞察</li><li><b>4</b>查看趋势</li></ol>
+        <button id="dismissGuide" aria-label="关闭体验指引">×</button>
+      </div>
+
       <div class="workspace-grid">
-        <section class="record-card surface">
+        <section class="record-card surface" id="recordCard">
           <div class="section-heading">
             <div>
               <span class="step-label">01 · 感受</span>
@@ -96,49 +107,77 @@
         </section>
 
         <aside class="insight-column">
-          <section class="insight-card surface" id="insightCard">
-            <div class="insight-topline"><span class="ai-badge"><i></i>温柔洞察</span><span id="insightTime">基于本次记录</span></div>
-            <div class="quote-mark">“</div>
-            <h2 id="insightTitle">你可能不是“不够努力”，只是连续消耗太久了。</h2>
-            <p id="insightBody">你提到连续会议和未完成的工作。即使已经回家，注意力仍停留在任务中，这种疲惫更像是持续消耗后的自然反应，而不是你的能力出了问题。</p>
-            <div class="pattern-box">
-              <span>我留意到的线索</span>
-              <div id="insightTags"><span>工作负荷</span><span>睡眠不足</span></div>
+          <section class="insight-card surface empty" id="insightCard" aria-live="polite">
+            <div class="insight-topline"><span class="ai-badge"><i></i>智能情绪洞察</span><span id="insightTime">等待本次记录</span></div>
+            <div class="insight-empty" id="insightEmpty">
+              <span class="empty-orbit" aria-hidden="true"><i></i></span>
+              <h2>完成记录后，我会帮你把感受整理清楚。</h2>
+              <p>情绪线索 · 可能触发 · 历史模式 · 此刻行动</p>
+            </div>
+            <div class="analysis-state" id="analysisState" hidden>
+              <span class="analysis-orb" aria-hidden="true"><i></i></span>
+              <h2>正在理解你的记录…</h2>
+              <p id="analysisStep">先辨认情绪和强度</p>
+              <div class="analysis-progress"><i></i></div>
+            </div>
+            <div class="insight-result" id="insightResult" hidden>
+              <div class="quote-mark">“</div>
+              <h2 id="insightTitle"></h2>
+              <p id="insightBody"></p>
+              <div class="pattern-box">
+                <span>我留意到的线索</span>
+                <div id="insightTags"></div>
+              </div>
             </div>
           </section>
 
-          <section class="care-section">
-            <div class="care-heading"><div><span class="step-label">此刻的自我关怀</span><h2>不用解决一切，先选一件小事</h2></div><span>约 3 分钟</span></div>
+          <section class="care-section locked" id="careSection" aria-live="polite">
+            <div class="care-heading"><div><span class="step-label">此刻的自我关怀</span><h2 id="careHeadingTitle">完成记录后获得首选方案</h2></div><span id="careDuration">约 1–3 分钟</span></div>
+            <div class="care-reason" id="careReason">推荐会综合你的情绪、强度、触发因素与近期反馈生成。</div>
             <div class="care-list">
-              <button class="care-card featured" data-care="breath">
+              <button class="care-card" data-care="breath" disabled>
+                <span class="recommend-badge">此刻更推荐</span>
                 <span class="care-icon breath-icon"><i></i></span>
-                <span><strong>跟随呼吸，放松一下</strong><small>吸气 4 秒 · 呼气 6 秒</small></span>
+                <span><strong id="breathTitle">一分钟慢呼吸</strong><small id="breathSubtitle">先让身体慢下来</small></span>
                 <i class="arrow">→</i>
               </button>
-              <button class="care-card" data-care="music">
+              <button class="care-card" data-care="music" disabled>
                 <span class="care-icon music-icon"><i></i><i></i><i></i></span>
-                <span><strong>播放舒缓环境音</strong><small>让注意力暂时离开任务</small></span>
+                <span><strong id="musicTitle">舒缓环境音</strong><small id="musicSubtitle">让注意力短暂离开任务</small></span>
                 <i class="arrow">→</i>
               </button>
-              <button class="care-card" data-care="stretch">
+              <button class="care-card" data-care="stretch" disabled>
                 <span class="care-icon stretch-icon"><i></i></span>
-                <span><strong>做一次肩颈伸展</strong><small>适合久坐和会议之后</small></span>
+                <span><strong id="stretchTitle">肩颈伸展</strong><small id="stretchSubtitle">释放久坐后的紧绷</small></span>
                 <i class="arrow">→</i>
               </button>
             </div>
+            <div class="care-controls" id="careControls" hidden><button class="text-button" id="swapCare">换一个方案</button><button class="text-button" id="skipCare">暂时不想做</button></div>
           </section>
         </aside>
       </div>
+
+      <section class="trust-strip" aria-label="产品原则">
+        <div><strong>低门槛记录</strong><span>两分钟完成，不要求写长日记</span></div>
+        <div><strong>看见触发模式</strong><span>从连续记录中发现情绪线索</span></div>
+        <div><strong>行动优先</strong><span>每次只推荐一个可立即开始的小动作</span></div>
+        <div><strong>本地隐私</strong><span>无需登录，内容留在当前设备</span></div>
+      </section>
     </section>
 
     <section class="page" id="journeyPage">
       <div class="journey-header">
-        <div><p class="eyebrow">你的情绪轨迹</p><h1>看见变化，而不是评判自己。</h1><p>趋势只是帮助你理解自己，不代表情绪有好坏之分。</p></div>
+        <div><p class="eyebrow">你的情绪轨迹</p><h1>看见变化，而不是评判自己。</h1><p>每个趋势都带着数据依据；你可以随时切换演示数据与自己的记录。</p></div>
         <button class="secondary-button" id="backToRecord">记录今天</button>
       </div>
 
+      <div class="data-toolbar">
+        <div class="data-toggle" role="group" aria-label="数据来源"><button class="active" data-mode="demo">演示数据</button><button data-mode="mine">我的记录</button></div>
+        <p id="dataNotice"><strong>当前展示演示数据</strong>，用于快速了解完整体验。你的记录不会与演示数据混合。</p>
+      </div>
+
       <div class="metrics-grid">
-        <article class="metric-card"><span>本周平均能量</span><strong id="averageScore">61</strong><small>较上周平稳</small></article>
+        <article class="metric-card"><span>本周平均状态</span><strong><b id="averageScore">61</b><em>/100</em></strong><small id="averageMeta">仅用于观察个人变化</small></article>
         <article class="metric-card"><span>本周记录</span><strong id="weeklyCount">6</strong><small>持续觉察中</small></article>
         <article class="metric-card"><span>最常出现</span><strong id="commonMood">疲惫</strong><small id="commonMoodMeta">3 次记录</small></article>
         <article class="metric-card"><span>高频触发</span><strong id="commonTrigger">工作</strong><small id="commonTriggerMeta">占本周记录 50%</small></article>
@@ -148,7 +187,11 @@
         <section class="surface chart-card">
           <div class="card-heading"><div><span class="step-label">最近 7 天</span><h2>情绪能量变化</h2></div><span class="legend"><i></i>能量值</span></div>
           <div class="chart-wrap" id="moodChart" aria-label="最近七天情绪能量折线图"></div>
-          <p class="chart-insight" id="chartInsight"><span></span>你的情绪在高强度工作日后容易下降，休息后通常会有所恢复。</p>
+          <div class="evidence-card" id="evidenceCard">
+            <div><span class="step-label">本周发现</span><strong id="evidenceTitle">低能量记录常与工作负荷同时出现</strong></div>
+            <p id="evidenceBody">正在根据当前数据生成可追溯结论。</p>
+            <div class="evidence-actions"><button class="text-button" id="showEvidence">查看相关记录</button><button class="text-button" id="rateEvidence">这个判断准确吗？</button></div>
+          </div>
         </section>
 
         <section class="surface trigger-card">
@@ -158,7 +201,7 @@
         </section>
       </div>
 
-      <section class="surface history-card">
+      <section class="surface history-card" id="historySection">
         <div class="card-heading"><div><span class="step-label">最近记录</span><h2>写下来的，都算数</h2></div><button class="text-button" id="clearEntries">清除我的本地记录</button></div>
         <div class="history-list" id="historyList"></div>
       </section>
