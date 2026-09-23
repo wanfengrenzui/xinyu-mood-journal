@@ -3,17 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="心屿是一款低门槛、可解释、会学习反馈的情绪日记与自我关怀工具。" />
+  <meta name="description" content="心屿是一款从情绪记录生成可解释洞察与 24 小时自适应关怀计划的本地优先工具。" />
   <meta name="theme-color" content="#fbfaf7" />
-  <title>心屿 v1.0.1｜情绪日记与自我关怀</title>
+  <title>心屿 v2.0｜自适应情绪关怀计划</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
   <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
   <header class="site-header">
-    <button class="brand" data-page-link="today" aria-label="返回心屿首页"><span class="brand-mark"><i></i></span><span>心屿</span><small>v1.0.1</small></button>
+    <button class="brand" data-page-link="today" aria-label="返回心屿首页"><span class="brand-mark"><i></i></span><span>心屿</span><small>v2.0</small></button>
     <nav class="main-nav" aria-label="主导航">
       <button class="nav-item active" data-page="today">今天</button>
+      <button class="nav-item" data-page="plan">计划</button>
       <button class="nav-item" data-page="journey">轨迹</button>
       <button class="nav-item" data-page="care">关怀库</button>
       <button class="nav-item" data-page="about">关于</button>
@@ -25,15 +26,15 @@
     <section class="page active" id="todayPage">
       <div class="hero">
         <div>
-          <p class="eyebrow">心屿 v1.0.1 · 懂你，也验证有效</p>
-          <h1>把说不清的情绪，<br />变成此刻能做的小事。</h1>
-          <p class="hero-copy">低门槛记录情绪和身体线索，获得有依据的洞察；完成一个小行动，再告诉心屿它是否真的帮到了你。</p>
-          <div class="hero-actions"><button class="primary-button compact" id="quickDemo">一键填入演示记录</button><button class="text-button" id="viewDemo">先看完整演示 →</button></div>
+          <p class="eyebrow">心屿 v2.0 · 从一次安慰，到持续照顾</p>
+          <h1>理解此刻，<br />也照顾接下来的你。</h1>
+          <p class="hero-copy">用一条记录生成可解释洞察与 24 小时关怀计划；练习后的真实变化，会继续调整下一次建议。</p>
+          <div class="hero-actions"><button class="primary-button compact" id="quickDemo">一键体验完整闭环</button><button class="secondary-button compact" id="quickRelief">我现在只想缓一缓</button><button class="text-button" id="viewDemo">先看产品证据 →</button></div>
         </div>
         <div class="hero-status"><span id="streakNumber">0</span><div><strong>天持续觉察</strong><small>记录不是打卡，是更早看见自己</small></div></div>
       </div>
 
-      <div class="flow-guide" id="flowGuide"><span>1 分钟体验</span><ol><li class="active">记录</li><li>理解</li><li>行动</li><li>反馈</li></ol><button id="dismissGuide" aria-label="关闭指引">×</button></div>
+      <div class="flow-guide" id="flowGuide"><span>1 分钟体验</span><ol><li class="active">记录</li><li>理解</li><li>行动</li><li>反馈</li><li>计划</li></ol><button id="dismissGuide" aria-label="关闭指引">×</button></div>
 
       <div class="workspace-grid">
         <section class="surface record-card" id="recordCard">
@@ -91,7 +92,7 @@
 
         <aside class="result-column">
           <section class="surface insight-card empty" id="insightCard" aria-live="polite">
-            <div class="insight-top"><span class="smart-badge"><i></i>智能情绪洞察</span><small id="insightMeta">等待本次记录</small></div>
+            <div class="insight-top"><span class="smart-badge"><i></i>智能情绪洞察</span><div class="insight-meta"><span id="insightConfidence">探索中</span><small id="insightMeta">等待本次记录</small></div></div>
             <div class="insight-empty" id="insightEmpty"><span class="orbit"><i></i></span><h2>记录完成后，我会把感受整理成可以理解的线索。</h2><p>事实 · 推测 · 历史 · 下一步</p></div>
             <div class="analysis-state" id="analysisState" hidden><span class="orbit analyzing"><i></i></span><h2>正在理解你的记录…</h2><p id="analysisStep">先辨认情绪与强度</p><div class="progress"><i></i></div></div>
             <div class="insight-result" id="insightResult" hidden>
@@ -116,10 +117,21 @@
       </div>
     </section>
 
+    <section class="page" id="planPage">
+      <div class="page-hero plan-hero"><div><p class="eyebrow">24 小时关怀计划</p><h1>不是一次安慰，<br />而是接住接下来的你。</h1><p>计划来自本次状态、可用时间和历史反馈；每一步都可以跳过、调整或标记完成。</p></div><button class="secondary-button" id="refreshPlan">重新生成计划</button></div>
+      <section class="surface plan-summary" id="planSummary">
+        <div><p class="step-label" id="planSource">等待本次记录</p><h2 id="planHeadline">完成一次记录后，心屿会生成一份轻量计划。</h2><p id="planReason">计划只安排三个低负担节点：现在先稳住身体，今晚减少继续消耗，明天留下一个可验证的小行动。</p></div>
+        <div class="plan-progress"><strong id="planProgress">0/3</strong><span>已完成</span></div>
+      </section>
+      <div class="plan-grid" id="planGrid"></div>
+      <section class="surface plan-adjustment"><div><p class="step-label">为什么这样安排</p><h2>建议有依据，也允许被你纠正。</h2></div><div class="plan-facts" id="planFacts"><span>基于情绪与强度</span><span>匹配当前场景</span><span>参考练习反馈</span></div><button class="text-button" id="planFeedback">这份计划不适合我</button></section>
+    </section>
+
     <section class="page" id="journeyPage">
       <div class="page-hero"><div><p class="eyebrow">情绪轨迹</p><h1>看见模式，不急着评判。</h1><p>所有结论都可以回到对应记录，关联不等于原因。</p></div><button class="secondary-button" data-page-link="today">记录今天</button></div>
       <div class="toolbar"><div class="segmented" id="dataMode"><button class="active" data-value="demo">演示数据</button><button data-value="mine">我的记录</button></div><div class="segmented" id="periodMode"><button class="active" data-value="7">7 天</button><button data-value="30">30 天</button></div><p id="dataNotice"></p></div>
       <div class="metrics-grid"><article><span>平均状态</span><strong><b id="averageScore">—</b><em>/100</em></strong><small>仅用于观察个人变化</small></article><article><span>记录次数</span><strong id="entryCount">0</strong><small id="periodLabel">最近 7 天</small></article><article><span>常见感受</span><strong id="commonMood">—</strong><small id="commonMoodMeta">等待记录</small></article><article><span>高频线索</span><strong id="commonTrigger">—</strong><small id="commonTriggerMeta">等待记录</small></article></div>
+      <section class="surface weekly-brief" id="weeklyBrief"><div><p class="step-label">AI 周度回顾</p><h2 id="reviewTitle">记录积累后，这里会总结变化而不是给你贴标签。</h2><p id="reviewBody">趋势结论会标注样本量、置信度和证据来源。</p></div><div class="confidence-block"><span>结论置信度</span><strong id="reviewConfidence">探索中</strong><small id="reviewSample">0 条记录</small></div><button class="secondary-button compact" id="reviewAction">查看证据</button></section>
       <div class="analytics-grid">
         <section class="surface chart-card"><div class="card-heading"><div><p class="step-label">状态变化</p><h2 id="chartTitle">最近 7 天</h2></div><span class="legend"><i></i>状态值</span></div><div class="chart-wrap" id="moodChart"></div><div class="evidence-card"><p class="step-label">有依据的发现</p><strong id="evidenceTitle"></strong><p id="evidenceBody"></p><div><button class="text-button" id="showEvidence">查看相关记录</button><button class="text-button" id="rateEvidence">这个判断准确吗？</button></div></div></section>
         <section class="surface pattern-card"><div class="card-heading"><div><p class="step-label">重复线索</p><h2>什么更常出现？</h2></div></div><div class="trigger-bars" id="triggerBars"></div><div class="body-summary" id="bodySummary"></div></section>
@@ -135,22 +147,22 @@
     </section>
 
     <section class="page" id="aboutPage">
-      <div class="page-hero"><div><p class="eyebrow">关于心屿</p><h1>这不是诊断工具，<br />而是一座通往自我觉察的小岛。</h1><p>心屿用低成本记录、可解释洞察和效果反馈，帮助用户找到当下可执行的小行动。</p></div></div>
+      <div class="page-hero"><div><p class="eyebrow">关于心屿 v2.0</p><h1>这不是诊断工具，<br />而是一套可被验证的关怀系统。</h1><p>心屿把低成本记录、可解释洞察、即时行动、效果反馈和 24 小时计划串成一个会学习的闭环。</p></div></div>
       <div class="about-grid">
         <section class="surface about-card featured"><span>01</span><h2>用户问题</h2><p>压力频繁但记录门槛高；情绪工具常只提供模板化安慰，用户不知道建议为何适合自己，也不知道是否真的有效。</p></section>
-        <section class="surface about-card"><span>02</span><h2>核心闭环</h2><p>记录情绪与身体线索 → 生成可解释洞察 → 推荐一个小行动 → 收集效果反馈 → 调整后续推荐。</p></section>
-        <section class="surface about-card"><span>03</span><h2>智能逻辑</h2><p>综合情绪、强度、触发因素、身体信号、场景、可用时间和历史反馈。当前版本采用透明的本地规则，不伪装成医疗AI。</p></section>
+        <section class="surface about-card"><span>02</span><h2>核心闭环</h2><p>记录 → 可解释洞察 → 即时练习 → 效果反馈 → 24 小时计划 → 下一次推荐持续校准。</p></section>
+        <section class="surface about-card"><span>03</span><h2>智能逻辑</h2><p>综合情绪、强度、触发因素、身体信号、场景、可用时间和历史反馈；结论同时展示样本量和置信度，不伪装成医疗 AI。</p></section>
         <section class="surface about-card"><span>04</span><h2>责任边界</h2><p>明确区分事实与推测；不进行心理疾病诊断；识别高风险表达后停止普通推荐，优先引导用户获得现实支持。</p></section>
       </div>
       <section class="surface principle-card"><div><p class="step-label">产品原则</p><h2>让技术退后一步，让用户保有控制权。</h2></div><ul><li><strong>本地优先</strong><span>无需登录，不上传记录。</span></li><li><strong>解释优先</strong><span>每条洞察说明依据。</span></li><li><strong>行动优先</strong><span>一次只做一个小动作。</span></li><li><strong>安全优先</strong><span>不诊断，不替代专业支持。</span></li></ul></section>
-      <section class="surface demo-story"><div><p class="step-label">建议体验路径</p><h2>用 1 分钟看见完整产品闭环</h2><p>回到“今天”点击“一键填入演示记录”，生成洞察后开始首选关怀，再提交练习后的强度变化；最后到“轨迹”和“关怀库”查看证据与个性化学习结果。</p></div><button class="primary-button compact" data-page-link="today">开始体验</button></section>
+      <section class="surface demo-story"><div><p class="step-label">建议体验路径</p><h2>用 1 分钟看见自适应关怀闭环</h2><p>回到“今天”点击“一键体验完整闭环”，生成洞察与三阶段计划；完成首选关怀并反馈变化，再到“计划”“轨迹”和“关怀库”查看系统如何持续调整。</p></div><button class="primary-button compact" data-page-link="today">开始体验</button></section>
     </section>
   </main>
 
   <footer><p>心屿用于日常情绪记录与自我觉察，不提供医学诊断或专业心理治疗。</p><p>如存在立即危险或伤害自己的想法，请联系可信任的人、当地紧急服务或前往最近的急诊机构。</p></footer>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <div class="modal-backdrop" id="modal" aria-hidden="true"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><button class="modal-close" id="closeModal" aria-label="关闭">×</button><div id="modalContent"></div></div></div>
-  <div class="modal-backdrop" id="privacyModal" aria-hidden="true"><div class="modal"><button class="modal-close" id="closePrivacy" aria-label="关闭">×</button><p class="step-label">隐私与安全</p><h2 id="modalTitle">记录首先属于你。</h2><p>当前版本无需登录，记录、草稿、偏好与反馈仅保存在当前浏览器，不会上传服务器。</p><ul><li>可导出和清除全部个人记录</li><li>演示数据与个人数据严格分开</li><li>智能洞察不构成医学判断</li><li>高风险表达会中止普通关怀推荐</li></ul><button class="primary-button compact" id="understandPrivacy">我知道了</button></div></div>
+  <div class="modal-backdrop" id="privacyModal" aria-hidden="true"><div class="modal"><button class="modal-close" id="closePrivacy" aria-label="关闭">×</button><p class="step-label">隐私与安全</p><h2 id="modalTitle">记录首先属于你。</h2><p>当前版本无需登录，记录、草稿、关怀计划、偏好与反馈仅保存在当前浏览器，不会上传服务器。</p><ul><li>可导出和清除全部个人记录</li><li>演示数据与个人数据严格分开</li><li>智能洞察不构成医学判断</li><li>高风险表达会中止普通关怀推荐</li></ul><button class="primary-button compact" id="understandPrivacy">我知道了</button></div></div>
   <script src="./app.js"></script>
 </body>
 </html>
