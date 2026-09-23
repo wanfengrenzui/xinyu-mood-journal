@@ -114,7 +114,6 @@ function setRecordMode(mode) {
 }
 
 function markDirty() {
-  currentEntryId=null;
   if(!$("#insightResult").hidden) {
     $("#insightResult").hidden=true; $("#insightEmpty").hidden=false; $("#insightCard").classList.add("empty");
     $("#insightMeta").textContent="等待更新记录"; lockCare();
@@ -149,8 +148,9 @@ function chooseMood(button) {
 }
 
 function selectTag(button, group) {
-  if(button.dataset.value==="说不清" && !button.classList.contains("selected")) $$(group+" button").forEach((item)=>item.classList.remove("selected"));
-  else if(button.dataset.value!=="说不清") { const unclear=$(group+' button[data-value="说不清"]'); if(unclear) unclear.classList.remove("selected"); }
+  const exclusiveValue=group==="#triggerOptions"?"说不清":"没有明显感觉";
+  if(button.dataset.value===exclusiveValue && !button.classList.contains("selected")) $$(group+" button").forEach((item)=>item.classList.remove("selected"));
+  else if(button.dataset.value!==exclusiveValue) { const exclusive=$(group+` button[data-value="${exclusiveValue}"]`); if(exclusive) exclusive.classList.remove("selected"); }
   button.classList.toggle("selected"); markDirty();
 }
 
@@ -169,7 +169,11 @@ function recommendCare(entry) {
   if(entry.bodies.some((b)=>["肩颈紧绷","身体疲惫"].includes(b)))scores.stretch+=5;
   if(entry.bodies.some((b)=>["胸口发紧","心跳变快"].includes(b)))scores.breath+=4;
   if(entry.triggers.includes("人际关系"))scores.ground+=3;
-  if(entry.availableTime===1){scores.breath+=2;scores.note+=2}
+  if(entry.scene==="办公室"||entry.scene==="学校"){scores.breath+=2;scores.stretch+=2}
+  if(entry.scene==="通勤途中")scores.ground+=4;
+  if(entry.scene==="睡前"){scores.breath+=3;scores.ground+=2}
+  if(entry.availableTime===1){scores.breath+=3;scores.note+=3;scores.stretch-=2;scores.ground-=2}
+  if(entry.availableTime>=10){scores.stretch+=2;scores.ground+=2}
   return Object.entries(scores).sort((a,b)=>b[1]-a[1]).map(([key])=>key);
 }
 function careReason(entry,type) {
@@ -177,10 +181,12 @@ function careReason(entry,type) {
   if(entry.intensity>=4)reasons.push(`感受强度为 ${entry.intensity}/5`);
   if(entry.bodies.length)reasons.push(`出现“${entry.bodies[0]}”`);
   if(entry.triggers.length)reasons.push(`提到“${entry.triggers[0]}”`);
+  if(entry.scene&&entry.scene!=="未填写")reasons.push(`当前在${entry.scene}`);
+  if(entry.availableTime)reasons.push(`愿意投入 ${entry.availableTime} 分钟`);
   const f=careFeedback()[type]; if(f?.better)reasons.push(`这种方法已有 ${f.better} 次有效反馈`);
   return `因为你${reasons.length?reasons.join("、"):"完成了此刻的记录"}，先尝试“${careCatalog[type].label}”更容易开始。推荐只是建议，你可以随时更换或停止。`;
 }
-function lockCare(){ $("#carePanel").classList.add("locked"); $("#careList").innerHTML=""; $("#careActions").hidden=true; $("#careTitle").textContent="完成记录后获得建议"; }
+function lockCare(){ $("#carePanel").classList.add("locked"); $("#careList").innerHTML=""; $("#careActions").hidden=true; $("#careTitle").textContent="完成记录后获得建议"; $("#careDuration").textContent="1–3 分钟"; $("#careReason").textContent="推荐会综合情绪、强度、场景、身体信号和历史反馈。"; }
 function displayCareOrder(entry) {
   activeCare=recommendedOrder[0];
   $("#careList").innerHTML=recommendedOrder.map((key,index)=>{const c=careCatalog[key];return `<button class="care-card ${index===0?"featured":""}" data-care="${key}">${index===0?'<span class="badge">此刻更推荐</span>':""}<span class="care-icon">${c.icon}</span><span><strong>${c.label}</strong><small>${c.summary} · ${Math.min(c.duration,entry.availableTime)} 分钟</small></span><i>→</i></button>`}).join("");
@@ -219,7 +225,7 @@ function analyzeEntry() {
   const text=$("#journalText").value.trim(); if(!text){$("#journalText").focus();showToast("写一句发生的事，或使用快捷描述");return} if(containsRisk(text)){openSafety();return}
   analysisTimers.forEach(clearTimeout); $("#insightEmpty").hidden=true; $("#insightResult").hidden=true; $("#analysisState").hidden=false; $("#insightCard").classList.remove("empty"); lockCare(); const button=$("#analyzeButton");button.disabled=true;button.querySelector("span").textContent="正在理解你的记录…";
   const entry=buildEntry(); ["连接触发因素与身体信号","检查近期是否出现重复模式","匹配此刻最容易开始的行动"].forEach((copy,index)=>analysisTimers.push(setTimeout(()=>$("#analysisStep").textContent=copy,300+index*280)));
-  analysisTimers.push(setTimeout(()=>{const entries=localEntries();entries.push(entry);localStorage.setItem(ENTRY_KEY,JSON.stringify(entries));currentEntryId=entry.id;showInsight(entry);button.disabled=false;button.querySelector("span").textContent="更新记录并重新分析";$("#streakNumber").textContent=new Set(entries.map((e)=>e.date)).size;showToast("已生成可解释洞察和首选方案");},1150));
+  analysisTimers.push(setTimeout(()=>{const entries=localEntries();const existingIndex=currentEntryId?entries.findIndex((item)=>item.id===currentEntryId):-1;if(existingIndex>=0){entry.id=currentEntryId;entry.createdAt=entries[existingIndex].createdAt;entry.updatedAt=new Date().toISOString();entries[existingIndex]=entry}else{entries.push(entry);currentEntryId=entry.id}localStorage.setItem(ENTRY_KEY,JSON.stringify(entries));showInsight(entry);button.disabled=false;button.querySelector("span").textContent="更新记录并重新分析";$("#streakNumber").textContent=new Set(entries.map((e)=>e.date)).size;showToast(existingIndex>=0?"本次记录已更新":"已生成可解释洞察和首选方案");},1150));
 }
 
 function openPractice(type,entry) {
@@ -275,7 +281,7 @@ function rateInsight(rate){localStorage.setItem("xinyu-last-insight-rate",rate);
 function rateEvidence(){openModal(`<p class="step-label">校准趋势判断</p><h2 id="modalTitle">这个发现符合你的感受吗？</h2><p>记录中的同时出现不一定代表原因，你的反馈能帮助系统保持克制。</p><div class="modal-actions"><button data-rate="yes">比较准确</button><button data-rate="no">不太准确</button></div>`);$$('[data-rate]').forEach((button)=>button.addEventListener("click",()=>{closeModal();showToast("已记录你的校准意见")}))}
 function exportEntries(){const entries=localEntries();if(!entries.length){showToast("还没有可导出的个人记录");return}const blob=new Blob([JSON.stringify({exportedAt:new Date().toISOString(),entries,careFeedback:careFeedback()},null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=`xinyu-records-${todayString()}.json`;a.click();URL.revokeObjectURL(url);showToast("个人记录已导出")}
 
-function fillDemo(){selectedMoods=["疲惫","焦虑"];$$("#moodOptions button").forEach((b)=>b.classList.toggle("selected",selectedMoods.includes(b.dataset.mood)));$("#intensity").value=4;$("#intensityValue").textContent="4 / 5";$("#journalText").value="今天连续开了几场会，回到家还是忍不住想着没完成的工作。";$("#charCount").textContent=`${$("#journalText").value.length} / 360`;$$("#triggerOptions button").forEach((b)=>b.classList.toggle("selected",["工作负荷","睡眠不足"].includes(b.dataset.value)));setRecordMode("full");$$("#bodyOptions button").forEach((b)=>b.classList.toggle("selected",["肩颈紧绷","身体疲惫"].includes(b.dataset.value)));$("#scene").value="家里";$("#availableTime").value="3";saveDraft();$("#recordCard").scrollIntoView({behavior:"smooth",block:"start"});showToast("已填入演示场景，现在可以生成洞察")}
+function fillDemo(){selectedMoods=["疲惫","焦虑"];$$("#moodOptions button").forEach((b)=>b.classList.toggle("selected",selectedMoods.includes(b.dataset.mood)));$("#intensity").value=4;$("#intensityValue").textContent="4 / 5";$("#journalText").value="今天连续开了几场会，回到家还是忍不住想着没完成的工作。";$("#charCount").textContent=`${$("#journalText").value.length} / 360`;$$("#triggerOptions button").forEach((b)=>b.classList.toggle("selected",["工作负荷","睡眠不足"].includes(b.dataset.value)));setRecordMode("full");$$("#bodyOptions button").forEach((b)=>b.classList.toggle("selected",["肩颈紧绷","身体疲惫"].includes(b.dataset.value)));$("#scene").value="家里";$("#availableTime").value="3";currentEntryId=null;markDirty();$("#recordCard").scrollIntoView({behavior:"smooth",block:"start"});showToast("已填入演示场景，现在可以生成洞察")}
 
 function init(){restoreDraft();$("#streakNumber").textContent=new Set(localEntries().map((e)=>e.date)).size;$$(".nav-item").forEach((b)=>b.addEventListener("click",()=>switchPage(b.dataset.page)));$$('[data-page-link]').forEach((b)=>b.addEventListener("click",()=>switchPage(b.dataset.pageLink)));$$("[data-record-mode]").forEach((b)=>b.addEventListener("click",()=>setRecordMode(b.dataset.recordMode)));$$("#moodOptions button").forEach((b)=>b.addEventListener("click",()=>chooseMood(b)));$("#intensity").addEventListener("input",(e)=>{$("#intensityValue").textContent=`${e.target.value} / 5`;markDirty()});$("#journalText").addEventListener("input",(e)=>{$("#charCount").textContent=`${e.target.value.length} / 360`;markDirty()});$("#showQuickPhrases").addEventListener("click",()=>$("#quickPhrases").hidden=!$("#quickPhrases").hidden);$$("#quickPhrases button").forEach((b)=>b.addEventListener("click",()=>{$("#journalText").value=b.textContent;$("#charCount").textContent=`${b.textContent.length} / 360`;$("#quickPhrases").hidden=true;markDirty()}));$$("#triggerOptions button").forEach((b)=>b.addEventListener("click",()=>selectTag(b,"#triggerOptions")));$$("#bodyOptions button").forEach((b)=>b.addEventListener("click",()=>selectTag(b,"#bodyOptions")));$("#scene").addEventListener("change",markDirty);$("#availableTime").addEventListener("change",markDirty);$("#analyzeButton").addEventListener("click",analyzeEntry);$("#quickDemo").addEventListener("click",fillDemo);$("#viewDemo").addEventListener("click",()=>{dataMode="demo";switchPage("journey")});$("#dismissGuide").addEventListener("click",()=>$("#flowGuide").hidden=true);$("#swapCare").addEventListener("click",cycleCare);$("#skipCare").addEventListener("click",()=>showToast("可以，暂时不做也是一种选择"));$$('[data-insight-rate]').forEach((b)=>b.addEventListener("click",()=>rateInsight(b.dataset.insightRate)));
   $$("#dataMode button").forEach((b)=>b.addEventListener("click",()=>{dataMode=b.dataset.value;$$("#dataMode button").forEach((x)=>x.classList.toggle("active",x===b));renderJourney()}));$$("#periodMode button").forEach((b)=>b.addEventListener("click",()=>{periodDays=Number(b.dataset.value);$$("#periodMode button").forEach((x)=>x.classList.toggle("active",x===b));renderJourney()}));$("#showEvidence").addEventListener("click",()=>highlightEntries(evidenceIds));$("#rateEvidence").addEventListener("click",rateEvidence);$("#exportEntries").addEventListener("click",exportEntries);$("#clearEntries").addEventListener("click",()=>{if(!localEntries().length){showToast("没有需要清除的个人记录");return}if(confirm("确认清除当前设备上的全部个人记录吗？此操作无法撤销。")){localStorage.removeItem(ENTRY_KEY);localStorage.removeItem(LEGACY_ENTRY_KEY);renderJourney();showToast("个人记录已清除")}});
